@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin · HOSAM Study Hub</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📊%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F7FB; --card: #FFFFFF; --border: #E5E7EB;
+    --text: #0F172A; --muted: #64748B;
+    --brand-mkt: #0F766E; --brand-bus: #2563EB; --brand-fin: #6C63FF;
+    --grad-brand: linear-gradient(120deg, #0F766E 0%, #2563EB 55%, #6C63FF 100%);
+    --danger: #DC2626;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Cairo','Inter',-apple-system,sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
+  header { background: var(--grad-brand); color: white; padding: 24px 0; margin-bottom: 24px; }
+  header .container { padding: 0 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+  header h1 { font-size: 22px; font-weight: 800; }
+  header button { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 16px; border-radius: 10px; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .login-card { max-width: 400px; margin: 80px auto; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 32px 28px; box-shadow: 0 20px 50px rgba(15,23,42,0.08); }
+  .login-card h1 { font-size: 22px; margin-bottom: 8px; }
+  .login-card p { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .field input { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; font-family: inherit; background: #FAFAFA; }
+  .field input:focus { outline: none; border-color: var(--brand-mkt); background: white; }
+  .login-btn { width: 100%; background: var(--grad-brand); color: white; border: none; padding: 12px; border-radius: 12px; font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 8px; }
+  .err { color: var(--danger); font-size: 13px; margin-top: 10px; min-height: 18px; }
+  .summary-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .summary-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; }
+  .summary-card .label { font-size: 12px; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
+  .summary-card .value { font-size: 26px; font-weight: 800; font-family: 'Inter',sans-serif; }
+  .summary-card .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .toolbar input { flex: 1; min-width: 200px; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-family: inherit; font-size: 14px; background: white; }
+  .toolbar button { background: var(--brand-mkt); color: white; border: none; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600; }
+  .toolbar button.secondary { background: white; color: var(--text); border: 1.5px solid var(--border); }
+  .feedback-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(15,23,42,0.04); }
+  .fc-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .fc-name { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .fc-name .num { background: var(--grad-brand); color: white; width: 28px; height: 28px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; font-family: 'Inter',sans-serif; }
+  .fc-meta { font-size: 12px; color: var(--muted); display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .fc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px 20px; }
+  .fc-row .lbl { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 4px; }
+  .fc-row .val { font-size: 14px; font-weight: 500; }
+  .fc-row .val.text { white-space: pre-wrap; word-wrap: break-word; }
+  .chip { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; margin: 2px 4px 2px 0; background: #F1F5F9; }
+  .chip.mkt { background: #CCFBF1; color: #0F766E; }
+  .chip.bus { background: #DBEAFE; color: #1E40AF; }
+  .chip.fin { background: #E0E7FF; color: #4338CA; }
+  .nps-badge { display: inline-block; padding: 4px 12px; border-radius: 8px; font-size: 14px; font-weight: 800; font-family: 'Inter',sans-serif; }
+  .nps-badge.promoter { background: #D1FAE5; color: #065F46; }
+  .nps-badge.passive { background: #FEF3C7; color: #92400E; }
+  .nps-badge.detractor { background: #FEE2E2; color: #991B1B; }
+  .wa-link { color: #25D366; text-decoration: none; font-weight: 600; font-family: 'Inter',sans-serif; }
+  .empty { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 15px; }
+  .empty .icon { font-size: 48px; margin-bottom: 12px; }
+  .loader { display: flex; justify-content: center; padding: 40px; color: var(--muted); font-size: 14px; }
+</style>
+</head>
+<body>
+
+<div id="loginView" style="display:none;">
+  <div class="container">
+    <div class="login-card">
+      <h1>📊 لوحة الفيدباك</h1>
+      <p>سجّل دخولك عشان تشوف الردود</p>
+      <form id="loginForm">
+        <div class="field"><label>الإيميل</label><input type="email" id="email" required autocomplete="email" /></div>
+        <div class="field"><label>كلمة المرور</label><input type="password" id="password" required autocomplete="current-password" /></div>
+        <button type="submit" class="login-btn" id="loginBtn">دخول</button>
+        <div class="err" id="loginErr"></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="dashView" style="display:none;">
+  <header>
+    <div class="container">
+      <h1>📊 لوحة الفيدباك</h1>
+      <div style="display:flex; gap:12px; align-items:center;">
+        <span id="userEmail" style="font-size:13px; opacity:0.9;"></span>
+        <button id="logoutBtn">خروج</button>
+      </div>
+    </div>
+  </header>
+  <div class="container">
+    <div class="summary-row" id="summaryRow"></div>
+    <div class="toolbar">
+      <input type="search" id="searchInput" placeholder="🔍 ابحث بالاسم، رقم، تعليق..." />
+      <button class="secondary" id="exportBtn">📥 تصدير CSV</button>
+      <button id="refreshBtn">🔄 تحديث</button>
+    </div>
+    <div id="cardsContainer"><div class="loader">جاري تحميل الردود...</div></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBkIRFpGXQs2dKsBxJCZqHAqnq4mz2MxYw",
+    authDomain: "mkt201-study-hub.firebaseapp.com",
+    projectId: "mkt201-study-hub",
+    storageBucket: "mkt201-study-hub.firebasestorage.app",
+    messagingSenderId: "445861877544",
+    appId: "1:445861877544:web:fc3e1c0bb3d52cb82f4fe4"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const ADMIN_EMAIL = 'hosamalmotairi@gmail.com';
+
+  const T = {
+    sites: { mkt: 'MKT 201', bus: 'BUS 214', fin: 'FIN 200' },
+    helped: { alot: 'ساعدني كثير 💯', some: 'ساعدني نوعاً ما', little: 'ساعدني شوي', no: 'ما ساعدني' },
+    usage: { daily: 'يومياً ☀️', few: 'عدة مرات في الأسبوع', night: 'ليلة الاختبار 🌙', once: 'مرة واحدة بس' },
+    source: { whatsapp: 'قروب الشعبة 💬', telegram: 'قناة التلقرام ✈️', twitter: 'القروب العام 📣', friend: 'صديق نصحه 🙌', other: 'طريقة ثانية' },
+    features: { questions: 'بنك الأسئلة', flashcards: 'الفلاش كاردز', summaries: 'الملخصات', darkmode: 'الوضع الليلي', arabic: 'الترجمة العربية', design: 'التصميم', mobile: 'الجوال', gamification: 'الألعاب والتحدي', pdf: 'تصدير PDF', other: 'ميزة ثانية' }
+  };
+
+  const loginView = document.getElementById('loginView');
+  const dashView = document.getElementById('dashView');
+  const loginErr = document.getElementById('loginErr');
+  const loginBtn = document.getElementById('loginBtn');
+
+  auth.onAuthStateChanged(user => {
+    if (user && user.email === ADMIN_EMAIL) {
+      loginView.style.display = 'none';
+      dashView.style.display = 'block';
+      document.getElementById('userEmail').textContent = user.email;
+      loadFeedback();
+    } else {
+      if (user) auth.signOut();
+      loginView.style.display = 'block';
+      dashView.style.display = 'none';
+    }
+  });
+
+  document.getElementById('loginForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    loginErr.textContent = '';
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'جاري الدخول...';
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    if (email !== ADMIN_EMAIL) {
+      loginErr.textContent = 'هذي اللوحة لحسام بس 🔒';
+      loginBtn.disabled = false; loginBtn.textContent = 'دخول'; return;
+    }
+    try { await auth.signInWithEmailAndPassword(email, password); }
+    catch (err) {
+      const msg = (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') ? 'كلمة المرور غلط' : (err.code === 'auth/user-not-found' ? 'الحساب مو موجود' : 'فشل: ' + err.message);
+      loginErr.textContent = msg;
+      loginBtn.disabled = false; loginBtn.textContent = 'دخول';
+    }
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', () => auth.signOut());
+  document.getElementById('refreshBtn').addEventListener('click', loadFeedback);
+
+  let allDocs = [];
+
+  async function loadFeedback() {
+    const container = document.getElementById('cardsContainer');
+    container.textContent = '';
+    const loader = document.createElement('div');
+    loader.className = 'loader';
+    loader.textContent = 'جاري تحميل الردود...';
+    container.appendChild(loader);
+    try {
+      const snap = await db.collection('hosam_feedback').orderBy('createdAt', 'desc').get();
+      allDocs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderSummary(allDocs);
+      renderCards(allDocs);
+    } catch (err) {
+      container.textContent = '';
+      const e = document.createElement('div');
+      e.className = 'empty';
+      e.textContent = '⚠️ فشل التحميل: ' + (err.message || err.code);
+      container.appendChild(e);
+    }
+  }
+
+  document.getElementById('searchInput').addEventListener('input', e => {
+    const q = e.target.value.trim().toLowerCase();
+    if (!q) { renderCards(allDocs); return; }
+    renderCards(allDocs.filter(d => JSON.stringify(d).toLowerCase().includes(q)));
+  });
+
+  function renderSummary(docs) {
+    const total = docs.length;
+    const npsVals = docs.map(d => d.nps).filter(n => typeof n === 'number');
+    const avgNps = npsVals.length ? (npsVals.reduce((a,b)=>a+b,0) / npsVals.length).toFixed(1) : '—';
+    const promoters = npsVals.filter(n => n >= 9).length;
+    const detractors = npsVals.filter(n => n <= 6).length;
+    const npsScore = npsVals.length ? Math.round((promoters - detractors) / npsVals.length * 100) : '—';
+    const helpedAlot = docs.filter(d => d.helped === 'alot').length;
+    const helpedPct = total ? Math.round(helpedAlot / total * 100) : 0;
+
+    const row = document.getElementById('summaryRow');
+    row.textContent = '';
+    [
+      { label: 'إجمالي الردود', value: total, sub: '' },
+      { label: 'متوسط التقييم', value: avgNps, sub: 'من 10' },
+      { label: 'NPS Score', value: npsScore, sub: promoters + ' مروّج · ' + detractors + ' منتقد' },
+      { label: '"ساعدني كثير"', value: helpedPct + '%', sub: helpedAlot + ' من ' + total }
+    ].forEach(c => {
+      const card = document.createElement('div');
+      card.className = 'summary-card';
+      const l = document.createElement('div'); l.className = 'label'; l.textContent = c.label;
+      const v = document.createElement('div'); v.className = 'value'; v.textContent = c.value;
+      const s = document.createElement('div'); s.className = 'sub'; s.textContent = c.sub;
+      card.appendChild(l); card.appendChild(v); if (c.sub) card.appendChild(s);
+      row.appendChild(card);
+    });
+  }
+
+  function renderCards(docs) {
+    const container = document.getElementById('cardsContainer');
+    container.textContent = '';
+    if (!docs.length) {
+      const e = document.createElement('div');
+      e.className = 'empty';
+      const i = document.createElement('div'); i.className = 'icon'; i.textContent = '📭';
+      const m = document.createTextNode('ما فيه ردود بعد');
+      e.appendChild(i); e.appendChild(m);
+      container.appendChild(e); return;
+    }
+    docs.forEach((d, i) => container.appendChild(buildCard(d, docs.length - i)));
+  }
+
+  function el(tag, className, text) {
+    const x = document.createElement(tag);
+    if (className) x.className = className;
+    if (text !== undefined) x.textContent = text;
+    return x;
+  }
+  function chip(text, cls) {
+    const c = document.createElement('span');
+    c.className = 'chip' + (cls ? ' ' + cls : '');
+    c.textContent = text;
+    return c;
+  }
+  function row(lbl, valNode, fullWidth) {
+    const r = document.createElement('div');
+    r.className = 'fc-row';
+    if (fullWidth) r.style.gridColumn = '1 / -1';
+    r.appendChild(el('div', 'lbl', lbl));
+    const v = document.createElement('div');
+    v.className = 'val';
+    if (typeof valNode === 'string') v.textContent = valNode || '—';
+    else if (valNode instanceof Node) v.appendChild(valNode);
+    else { v.textContent = '—'; }
+    r.appendChild(v);
+    return r;
+  }
+  function textRow(lbl, txt, fullWidth) {
+    const r = document.createElement('div');
+    r.className = 'fc-row';
+    if (fullWidth) r.style.gridColumn = '1 / -1';
+    r.appendChild(el('div', 'lbl', lbl));
+    const v = document.createElement('div');
+    v.className = 'val text';
+    v.textContent = txt || '—';
+    r.appendChild(v);
+    return r;
+  }
+
+  function buildCard(d, num) {
+    const date = d.createdAt && d.createdAt.toDate ? d.createdAt.toDate() : null;
+    const dateStr = date ? date.toLocaleString('ar-SA', { dateStyle: 'medium', timeStyle: 'short' }) : '—';
+
+    const card = document.createElement('div');
+    card.className = 'feedback-card';
+
+    // Head
+    const head = el('div', 'fc-head');
+    const nameDiv = el('div', 'fc-name');
+    const numBadge = el('span', 'num', String(num));
+    nameDiv.appendChild(numBadge);
+    nameDiv.appendChild(document.createTextNode(' ' + (d.name || '—')));
+    head.appendChild(nameDiv);
+
+    const meta = el('div', 'fc-meta');
+    meta.appendChild(el('span', null, '📅 ' + dateStr));
+    const nps = typeof d.nps === 'number' ? d.nps : null;
+    const npsClass = nps === null ? '' : nps >= 9 ? 'promoter' : nps >= 7 ? 'passive' : 'detractor';
+    const npsLabel = nps === null ? '—' : nps >= 9 ? 'مروّج' : nps >= 7 ? 'محايد' : 'منتقد';
+    const npsBadge = el('span', 'nps-badge ' + npsClass, (nps !== null ? nps + '/10' : '—') + ' · ' + npsLabel);
+    meta.appendChild(npsBadge);
+    head.appendChild(meta);
+    card.appendChild(head);
+
+    // Grid
+    const grid = el('div', 'fc-grid');
+
+    // Sites
+    const sitesWrap = document.createElement('div');
+    (d.sites || []).forEach(s => sitesWrap.appendChild(chip(T.sites[s] || s, s)));
+    grid.appendChild(row('المواقع المستخدمة', sitesWrap.children.length ? sitesWrap : '—'));
+
+    grid.appendChild(row('ساعدني بالاختبار؟', T.helped[d.helped] || d.helped || '—'));
+    grid.appendChild(row('عدد مرات الاستخدام', T.usage[d.usage] || d.usage || '—'));
+
+    // Source
+    const srcLabel = T.source[d.source] || d.source || '—';
+    const srcExtra = (d.source === 'other' && d.otherSource) ? ' (' + d.otherSource + ')' : '';
+    grid.appendChild(row('عرف عن الموقع من', srcLabel + srcExtra));
+
+    // Features
+    const featWrap = document.createElement('div');
+    (d.features || []).forEach(f => featWrap.appendChild(chip(T.features[f] || f)));
+    if (d.otherFeature) {
+      const oc = chip(d.otherFeature);
+      oc.style.background = '#FEF3C7'; oc.style.color = '#92400E';
+      featWrap.appendChild(oc);
+    }
+    grid.appendChild(row('المزايا اللي عجبته', featWrap.children.length ? featWrap : '—', true));
+
+    grid.appendChild(textRow('💡 اقتراحات / ميزات يبيها', d.comment, true));
+    grid.appendChild(textRow('⚠️ السلبيات / الملاحظات', d.cons, true));
+    grid.appendChild(textRow('📚 كورسات الجاي', d.coursesText));
+
+    // WhatsApp
+    const wa = (d.whatsapp || '').replace(/\D/g, '');
+    if (wa) {
+      const a = document.createElement('a');
+      a.className = 'wa-link';
+      a.target = '_blank';
+      a.rel = 'noopener';
+      const intl = wa.startsWith('966') ? wa : '966' + wa.replace(/^0/, '');
+      a.href = 'https://wa.me/' + intl;
+      a.textContent = d.whatsapp + ' ↗';
+      grid.appendChild(row('📱 واتساب', a));
+    } else {
+      grid.appendChild(row('📱 واتساب', '—'));
+    }
+
+    card.appendChild(grid);
+    return card;
+  }
+
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    if (!allDocs.length) { alert('ما فيه ردود تتصدر'); return; }
+    const headers = ['#','الاسم','التاريخ','NPS','ساعد بالاختبار','الاستخدام','المصدر','المواقع','المزايا','اقتراحات','سلبيات','كورسات الجاي','واتساب'];
+    const rows = allDocs.map((d, i) => [
+      allDocs.length - i,
+      d.name || '',
+      d.createdAt && d.createdAt.toDate ? d.createdAt.toDate().toLocaleString('ar-SA') : '',
+      d.nps == null ? '' : d.nps,
+      T.helped[d.helped] || d.helped || '',
+      T.usage[d.usage] || d.usage || '',
+      (T.source[d.source] || d.source || '') + (d.otherSource ? ' (' + d.otherSource + ')' : ''),
+      (d.sites || []).map(s => T.sites[s] || s).join(' · '),
+      (d.features || []).map(f => T.features[f] || f).join(' · ') + (d.otherFeature ? ' · ' + d.otherFeature : ''),
+      d.comment || '',
+      d.cons || '',
+      d.coursesText || '',
+      d.whatsapp || ''
+    ]);
+    const csv = [headers, ...rows].map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'hosam-feedback-' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+</script>
+</body>
+</html>
