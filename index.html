@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تقييم · HOSAM Study Hub</title>
+  <meta name="description" content="ساعدني أطوّر مواقع المذاكرة — شاركني رأيك في دقيقة واحدة." />
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎓%3C/text%3E%3C/svg%3E" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* HOSAM Study Hub — Universal Feedback
+       Palette blends the 3 brands:
+         MKT 201 = Teal   (#0F766E)
+         BUS 214 = Blue   (#2563EB)
+         FIN 200 = Indigo (#6C63FF)
+         Accent  = Amber  (#F59E0B) */
+    :root {
+      --brand-mkt:#0F766E; --brand-bus:#2563EB; --brand-fin:#6C63FF;
+      --brand-amber:#F59E0B;
+      --grad-brand: linear-gradient(120deg, #0F766E 0%, #2563EB 55%, #6C63FF 100%);
+      --primary:#2563EB; --primary-hover:#1D4ED8;
+      --primary-tint:rgba(37,99,235,.08); --primary-border:rgba(37,99,235,.25);
+      --accent:#F59E0B;
+      --correct:#16A34A; --wrong:#DC2626;
+      --bg:#F8FAFC; --surface:#FFFFFF; --surface-2:#F1F5F9;
+      --border:#E2E8F0; --text:#0F172A;
+      --text-muted:#64748B; --text-faint:#94A3B8;
+      --shadow-sm:0 2px 8px rgba(15,23,42,.04);
+      --shadow-md:0 12px 32px rgba(15,23,42,.06);
+      --shadow-lg:0 24px 64px rgba(15,23,42,.10);
+      --shadow-brand:0 18px 40px rgba(37,99,235,.14);
+      --radius-sm:10px; --radius-md:16px; --radius-lg:24px;
+    }
+    body.dark {
+      --primary:#60A5FA; --primary-hover:#93C5FD;
+      --primary-tint:rgba(96,165,250,.14); --primary-border:rgba(96,165,250,.32);
+      --accent:#FBBF24;
+      --bg:#0B1120; --surface:#111827; --surface-2:#1E293B;
+      --border:#1E293B; --text:#F1F5F9;
+      --text-muted:#94A3B8; --text-faint:#64748B;
+      --shadow-sm:0 2px 8px rgba(0,0,0,.30);
+      --shadow-md:0 12px 32px rgba(0,0,0,.35);
+      --shadow-lg:0 24px 64px rgba(0,0,0,.45);
+      --shadow-brand:0 18px 40px rgba(96,165,250,.20);
+      --grad-brand: linear-gradient(120deg, #2DD4BF 0%, #60A5FA 55%, #A78BFA 100%);
+    }
+
+    * { box-sizing:border-box; margin:0; padding:0; }
+    html { -webkit-text-size-adjust:100%; scroll-behavior:smooth; }
+    body {
+      font-family:'Cairo','Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+      background:var(--bg); color:var(--text);
+      min-height:100vh; line-height:1.65;
+      transition:background .3s, color .3s; overflow-x:hidden;
+    }
+    body::before {
+      content:''; position:fixed; inset:0;
+      background:
+        radial-gradient(ellipse 600px 400px at 15% 10%, rgba(15,118,110,.12), transparent 60%),
+        radial-gradient(ellipse 700px 500px at 85% 20%, rgba(37,99,235,.10), transparent 60%),
+        radial-gradient(ellipse 600px 400px at 50% 90%, rgba(108,99,255,.10), transparent 60%);
+      pointer-events:none; z-index:0;
+    }
+    body.dark::before {
+      background:
+        radial-gradient(ellipse 600px 400px at 15% 10%, rgba(45,212,191,.15), transparent 60%),
+        radial-gradient(ellipse 700px 500px at 85% 20%, rgba(96,165,250,.14), transparent 60%),
+        radial-gradient(ellipse 600px 400px at 50% 90%, rgba(167,139,250,.14), transparent 60%);
+    }
+
+    .topbar {
+      position:relative; z-index:10;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:18px 28px; background:var(--surface);
+      border-bottom:1px solid var(--border); backdrop-filter:blur(10px);
+    }
+    .brand { display:flex; align-items:center; gap:12px; font-weight:800; font-size:1.05rem; color:var(--text); }
+    .brand-logo {
+      width:40px; height:40px; border-radius:12px;
+      background:var(--grad-brand);
+      display:grid; place-items:center;
+      font-size:1.25rem; box-shadow:var(--shadow-brand);
+      position:relative;
+    }
+    .brand-logo::after {
+      content:''; position:absolute; inset:0; border-radius:12px;
+      background:linear-gradient(135deg, rgba(255,255,255,.3), transparent 50%);
+      pointer-events:none;
+    }
+    .brand-name { line-height:1.15; }
+    .brand-sub { font-size:.72rem; color:var(--text-muted); font-weight:500; }
+    .dark-toggle {
+      background:var(--surface-2); border:1px solid var(--border);
+      width:42px; height:42px; border-radius:50%;
+      cursor:pointer; font-size:1.1rem;
+      display:grid; place-items:center;
+      transition:all .2s; color:var(--text);
+    }
+    .dark-toggle:hover { transform:scale(1.08) rotate(-8deg); border-color:var(--primary-border); }
+
+    .wrap { position:relative; z-index:1; max-width:760px; margin:0 auto; padding:48px 24px 120px; }
+
+    .hero { text-align:center; margin-bottom:44px; animation:slideDown .7s ease-out; }
+    @keyframes slideDown {
+      from { opacity:0; transform:translateY(-20px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    .hero-emoji {
+      font-size:3.6rem; display:inline-block;
+      animation:wave 2.6s ease-in-out infinite; transform-origin:70% 70%;
+      filter:drop-shadow(0 6px 14px rgba(37,99,235,.20));
+    }
+    @keyframes wave {
+      0%,100% { transform:rotate(0deg); }
+      25% { transform:rotate(14deg); }
+      75% { transform:rotate(-8deg); }
+    }
+    .hero h1 {
+      font-size:2.4rem; font-weight:900;
+      margin:14px 0 10px;
+      background:var(--grad-brand);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text; line-height:1.3; letter-spacing:-.01em;
+    }
+    .hero p { color:var(--text-muted); font-size:1.05rem; max-width:520px; margin:0 auto; }
+
+    .site-badges { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:20px; }
+    .site-badge {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 14px; border-radius:999px;
+      font-size:.8rem; font-weight:700;
+      font-family:'Inter','Cairo',sans-serif; border:1px solid;
+    }
+    .site-badge.mkt { color:var(--brand-mkt); background:rgba(15,118,110,.08); border-color:rgba(15,118,110,.25); }
+    .site-badge.bus { color:var(--brand-bus); background:rgba(37,99,235,.08); border-color:rgba(37,99,235,.25); }
+    .site-badge.fin { color:var(--brand-fin); background:rgba(108,99,255,.08); border-color:rgba(108,99,255,.25); }
+    body.dark .site-badge.mkt { color:#5EEAD4; background:rgba(15,118,110,.20); border-color:rgba(45,212,191,.30); }
+    body.dark .site-badge.bus { color:#93C5FD; background:rgba(37,99,235,.20); border-color:rgba(96,165,250,.30); }
+    body.dark .site-badge.fin { color:#C4B5FD; background:rgba(108,99,255,.20); border-color:rgba(167,139,250,.30); }
+
+    .progress-pill {
+      display:inline-flex; align-items:center; gap:8px;
+      background:var(--primary-tint); border:1px solid var(--primary-border);
+      padding:6px 16px; border-radius:999px;
+      font-size:.85rem; color:var(--primary); font-weight:700;
+      margin-bottom:14px; font-family:'Inter','Cairo',sans-serif;
+    }
+    .progress-pill-dot {
+      width:8px; height:8px; border-radius:50%;
+      background:var(--primary); animation:pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity:1; transform:scale(1); }
+      50% { opacity:.45; transform:scale(.85); }
+    }
+
+    .card {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--radius-lg); padding:28px;
+      margin-bottom:18px; box-shadow:var(--shadow-md);
+      animation:cardIn .55s ease-out backwards;
+      position:relative; overflow:hidden;
+    }
+    .card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:3px;
+      background:var(--grad-brand); opacity:0; transition:opacity .35s;
+    }
+    .card:focus-within::before, .card:hover::before { opacity:1; }
+    .card:nth-child(1) { animation-delay:.05s; }
+    .card:nth-child(2) { animation-delay:.11s; }
+    .card:nth-child(3) { animation-delay:.17s; }
+    .card:nth-child(4) { animation-delay:.23s; }
+    .card:nth-child(5) { animation-delay:.29s; }
+    .card:nth-child(6) { animation-delay:.35s; }
+    @keyframes cardIn {
+      from { opacity:0; transform:translateY(14px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    .q-label {
+      display:flex; align-items:center; gap:12px;
+      font-size:1.08rem; font-weight:800; color:var(--text);
+      margin-bottom:16px; flex-wrap:wrap;
+    }
+    .q-num {
+      width:30px; height:30px; border-radius:9px;
+      background:var(--grad-brand); color:white;
+      display:grid; place-items:center;
+      font-size:.88rem; font-weight:800;
+      font-family:'Inter',sans-serif; flex-shrink:0;
+      box-shadow:var(--shadow-sm);
+    }
+    .q-optional {
+      font-size:.7rem; color:var(--text-muted);
+      background:var(--surface-2); padding:3px 10px;
+      border-radius:999px; font-weight:600; border:1px solid var(--border);
+    }
+    .q-hint { font-size:.85rem; color:var(--text-muted); margin-bottom:14px; padding-inline-start:42px; }
+
+    .site-picks { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+    @media (max-width:520px) { .site-picks { grid-template-columns:1fr; } }
+    .site-pick {
+      cursor:pointer; padding:16px 14px;
+      border-radius:var(--radius-md);
+      border:2px solid var(--border);
+      background:var(--surface); text-align:center;
+      transition:all .22s; position:relative; overflow:hidden;
+    }
+    .site-pick input { position:absolute; opacity:0; pointer-events:none; }
+    .site-pick-name { font-weight:800; font-family:'Inter','Cairo',sans-serif; font-size:1.05rem; margin-bottom:4px; }
+    .site-pick-ar { font-size:.8rem; color:var(--text-muted); font-weight:600; }
+    .site-pick-dot { position:absolute; top:10px; inset-inline-start:10px; width:10px; height:10px; border-radius:50%; }
+    .site-pick[data-site="mkt"] .site-pick-dot { background:var(--brand-mkt); }
+    .site-pick[data-site="bus"] .site-pick-dot { background:var(--brand-bus); }
+    .site-pick[data-site="fin"] .site-pick-dot { background:var(--brand-fin); }
+    .site-pick:hover { transform:translateY(-2px); box-shadow:var(--shadow-md); }
+    .site-pick[data-site="mkt"]:hover { border-color:var(--brand-mkt); }
+    .site-pick[data-site="bus"]:hover { border-color:var(--brand-bus); }
+    .site-pick[data-site="fin"]:hover { border-color:var(--brand-fin); }
+    .site-pick.selected[data-site="mkt"] { border-color:var(--brand-mkt); background:rgba(15,118,110,.08); color:var(--brand-mkt); }
+    .site-pick.selected[data-site="bus"] { border-color:var(--brand-bus); background:rgba(37,99,235,.08); color:var(--brand-bus); }
+    .site-pick.selected[data-site="fin"] { border-color:var(--brand-fin); background:rgba(108,99,255,.08); color:var(--brand-fin); }
+    body.dark .site-pick.selected[data-site="mkt"] { background:rgba(15,118,110,.22); color:#5EEAD4; }
+    body.dark .site-pick.selected[data-site="bus"] { background:rgba(37,99,235,.22); color:#93C5FD; }
+    body.dark .site-pick.selected[data-site="fin"] { background:rgba(108,99,255,.22); color:#C4B5FD; }
+
+    .nps-wrap { display:grid; grid-template-columns:repeat(11,1fr); gap:6px; margin-bottom:12px; }
+    @media (max-width:560px) { .nps-wrap { grid-template-columns:repeat(6,1fr); } }
+    .nps-btn {
+      aspect-ratio:1; border:1.5px solid var(--border);
+      background:var(--surface); border-radius:var(--radius-sm);
+      font-family:'Inter',sans-serif; font-weight:700;
+      font-size:1rem; color:var(--text);
+      cursor:pointer; transition:all .18s;
+      display:grid; place-items:center;
+    }
+    .nps-btn:hover { transform:translateY(-2px); border-color:var(--primary); box-shadow:var(--shadow-sm); }
+    .nps-btn.selected {
+      background:var(--grad-brand); border-color:transparent;
+      color:white; transform:scale(1.05); box-shadow:var(--shadow-brand);
+    }
+    .nps-legend { display:flex; justify-content:space-between; font-size:.78rem; color:var(--text-muted); padding:0 4px; }
+
+    .chips { display:flex; flex-wrap:wrap; gap:8px; }
+    .chip {
+      padding:9px 16px; border:1.5px solid var(--border);
+      background:var(--surface); border-radius:999px;
+      font-size:.9rem; font-weight:600; color:var(--text);
+      cursor:pointer; transition:all .18s;
+      font-family:'Cairo','Inter',sans-serif;
+    }
+    .chip:hover { border-color:var(--primary); transform:translateY(-1px); }
+    .chip.selected {
+      background:var(--grad-brand); border-color:transparent;
+      color:white; box-shadow:var(--shadow-sm);
+    }
+
+    .radios { display:grid; gap:8px; }
+    .radio-card {
+      cursor:pointer; padding:14px 16px;
+      border:1.5px solid var(--border); border-radius:var(--radius-md);
+      background:var(--surface); display:flex; align-items:center; gap:12px;
+      transition:all .18s;
+    }
+    .radio-card input { position:absolute; opacity:0; }
+    .radio-dot {
+      width:20px; height:20px; border-radius:50%;
+      border:2px solid var(--border);
+      display:grid; place-items:center; flex-shrink:0;
+      transition:all .18s;
+    }
+    .radio-dot::after {
+      content:''; width:10px; height:10px; border-radius:50%;
+      background:white; opacity:0; transition:opacity .18s;
+    }
+    .radio-card:hover { border-color:var(--primary); }
+    .radio-card.selected { border-color:var(--primary); background:var(--primary-tint); }
+    .radio-card.selected .radio-dot { background:var(--primary); border-color:var(--primary); }
+    .radio-card.selected .radio-dot::after { opacity:1; }
+    .radio-label { font-weight:600; flex:1; }
+
+    textarea {
+      width:100%; min-height:110px; padding:14px 16px;
+      border:1.5px solid var(--border); border-radius:var(--radius-md);
+      background:var(--surface); color:var(--text);
+      font-family:inherit; font-size:.95rem; line-height:1.65;
+      resize:vertical; transition:all .18s;
+    }
+    textarea:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 4px var(--primary-tint); }
+    textarea::placeholder { color:var(--text-faint); }
+
+    input[type="text"].other-input {
+      width:100%; padding:12px 14px;
+      border:1.5px solid var(--border); border-radius:var(--radius-md);
+      background:var(--surface); color:var(--text);
+      font-family:inherit; font-size:.92rem;
+      margin-top:10px; transition:all .18s;
+    }
+    input[type="text"].other-input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 4px var(--primary-tint); }
+
+    .submit-wrap { text-align:center; margin-top:32px; }
+    .submit-btn {
+      padding:16px 48px; background:var(--grad-brand);
+      color:white; border:none; border-radius:999px;
+      font-family:inherit; font-size:1.05rem; font-weight:800;
+      cursor:pointer; transition:all .25s;
+      box-shadow:var(--shadow-brand);
+      position:relative; overflow:hidden;
+    }
+    .submit-btn::after {
+      content:''; position:absolute; inset:0;
+      background:linear-gradient(120deg, transparent 30%, rgba(255,255,255,.25) 50%, transparent 70%);
+      transform:translateX(-100%); transition:transform .8s;
+    }
+    .submit-btn:hover:not(:disabled) { transform:translateY(-2px) scale(1.02); }
+    .submit-btn:hover:not(:disabled)::after { transform:translateX(100%); }
+    .submit-btn:disabled { opacity:.55; cursor:not-allowed; }
+    .submit-hint { font-size:.83rem; color:var(--text-muted); margin-top:14px; }
+
+    .thankyou { display:none; text-align:center; padding:48px 24px; animation:cardIn .6s ease-out; }
+    .thankyou.show { display:block; }
+    .thankyou-emoji {
+      font-size:4.5rem; display:inline-block;
+      animation:bounce 1s ease-in-out;
+      filter:drop-shadow(0 8px 16px rgba(37,99,235,.25));
+    }
+    @keyframes bounce {
+      0%,100% { transform:translateY(0); }
+      50% { transform:translateY(-18px); }
+    }
+    .thankyou h2 {
+      font-size:2rem; font-weight:900; margin:18px 0 10px;
+      background:var(--grad-brand);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .thankyou p { color:var(--text-muted); font-size:1rem; max-width:480px; margin:0 auto 24px; }
+    .contact-row { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
+    .contact-btn {
+      padding:12px 22px; border-radius:999px;
+      text-decoration:none; font-weight:700; font-size:.92rem;
+      transition:all .2s; border:1.5px solid var(--border);
+      background:var(--surface); color:var(--text);
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .contact-btn:hover { transform:translateY(-2px); border-color:var(--primary); box-shadow:var(--shadow-sm); }
+
+    .toast {
+      position:fixed; bottom:28px; left:50%;
+      transform:translateX(-50%) translateY(140%);
+      background:var(--wrong); color:white;
+      padding:14px 24px; border-radius:999px;
+      font-weight:700; box-shadow:var(--shadow-lg);
+      z-index:100; transition:transform .35s;
+      max-width:calc(100vw - 32px); text-align:center;
+    }
+    .toast.show { transform:translateX(-50%) translateY(0); }
+
+    .loading {
+      display:inline-block; width:18px; height:18px;
+      border:2.5px solid rgba(255,255,255,.35);
+      border-top-color:white; border-radius:50%;
+      animation:spin .7s linear infinite;
+      vertical-align:middle; margin-inline-end:8px;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    .foot { text-align:center; color:var(--text-muted); font-size:.82rem; margin-top:40px; padding:20px; }
+    .foot-links { margin-top:8px; display:flex; justify-content:center; gap:14px; flex-wrap:wrap; }
+    .foot-links a { color:var(--text-muted); text-decoration:none; font-weight:600; transition:color .2s; }
+    .foot-links a:hover { color:var(--primary); }
+    .foot-sep { opacity:.5; }
+
+    .req { color:var(--wrong); font-weight:900; }
+
+    @media (max-width:560px) {
+      .topbar { padding:14px 18px; }
+      .wrap { padding:32px 16px 100px; }
+      .hero h1 { font-size:1.8rem; }
+      .hero-emoji { font-size:3rem; }
+      .card { padding:20px 18px; }
+      .q-label { font-size:1rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-logo">🎓</div>
+      <div class="brand-name">
+        <div>HOSAM Study Hub</div>
+        <div class="brand-sub">تقييم المواقع</div>
+      </div>
+    </div>
+    <button class="dark-toggle" id="darkToggle" aria-label="Toggle dark mode">🌙</button>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="progress-pill">
+        <span class="progress-pill-dot"></span>
+        <span>دقيقتين · 11 سؤال</span>
+      </div>
+      <div class="hero-emoji">👋</div>
+      <h1>رأيك يبني الموقع القادم</h1>
+      <p>شاركني تجربتك مع المواقع الثلاثة. كل إجابة تساعدني أطوّر موقع أفضل للمذاكرة في الكورسات الجاية.</p>
+      <div class="site-badges">
+        <span class="site-badge mkt">● MKT 201</span>
+        <span class="site-badge bus">● BUS 214</span>
+        <span class="site-badge fin">● FIN 200</span>
+      </div>
+    </section>
+
+    <form id="feedbackForm">
+
+      <div class="card">
+        <div class="q-label">
+          <span class="q-num">1</span>
+          <span>اسمك</span>
+        </div>
+        <input type="text" class="other-input" id="userName" placeholder="اكتب اسمك هنا..." style="display:block; margin-top:0;" />
+      </div>
+
+      <div class="card">
+        <div class="q-label">
+          <span class="q-num">2</span>
+          <span>أي موقع استخدمت؟</span>
+        </div>
+        <div class="q-hint">اختر الكل اللي جربته — تقدر تختار أكثر من موقع</div>
+        <div class="site-picks" id="sitePicks">
+          <label class="site-pick" data-site="mkt">
+            <span class="site-pick-dot"></span>
+            <input type="checkbox" name="site" value="mkt" />
+            <div class="site-pick-name">MKT 201</div>
+            <div class="site-pick-ar">التسويق</div>
+          </label>
+          <label class="site-pick" data-site="bus">
+            <span class="site-pick-dot"></span>
+            <input type="checkbox" name="site" value="bus" />
+            <div class="site-pick-name">BUS 214</div>
+            <div class="site-pick-ar">أخلاقيات الأعمال</div>
+          </label>
+          <label class="site-pick" data-site="fin">
+            <span class="site-pick-dot"></span>
+            <input type="checkbox" name="site" value="fin" />
+            <div class="site-pick-name">FIN 200</div>
+            <div class="site-pick-ar">المالية</div>
+          </label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="q-label">
+          <span class="q-num">3</span>
+          <span>تنصح زملاءك بموقع حسام؟</span>
+        </div>
+        <div class="q-hint">قيّم من 0 (أبداً ما أنصح فيه) إلى 10 (أكيد بنصح فيه)</div>
+        <div class="nps-wrap" id="npsWrap">
+          <button type="button" class="nps-btn" data-nps="0">0</button>
+          <button type="button" class="nps-btn" data-nps="1">1</button>
+          <button type="button" class="nps-btn" data-nps="2">2</button>
+          <button type="button" class="nps-btn" data-nps="3">3</button>
+          <button type="button" class="nps-btn" data-nps="4">4</button>
+          <button type="button" class="nps-btn" data-nps="5">5</button>
+          <button type="button" class="nps-btn" data-nps="6">6</button>
+          <button type="button" class="nps-btn" data-nps="7">7</button>
+          <button type="button" class="nps-btn" data-nps="8">8</button>
+          <button type="button" class="nps-btn" data-nps="9">9</button>
+          <button type="button" class="nps-btn" data-nps="10">10</button>
+        </div>
+        <div class="nps-legend">
+          <span>ما أنصح 👎</span>
+          <span>أكيد بنصح 🔥</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="q-label">
+          <span class="q-num">4</span>
+          <span>الموقع ساعدك فعلاً في الاختبار؟</span>
+        </div>
+        <div class="q-hint">بصراحة — هذا أهم سؤال عندي</div>
+        <div class="radios" id="helpedRadios">
+          <label class="radio-card" data-val="alot">
+            <input type="radio" name="helped" value="alot" />
+            <span class="radio-dot"></span>
+            <span class="radio-label">ساعدني كثير · فرق معاي حقيقي 🌟</span>
+          </label>
+          <label class="radio-card" data-val="some">
+            <input type="radio" name="helped" value="some" />
+            <span class="radio-dot"></span>
+            <span class="radio-label">ساعدني نوعاً ما</span>
+          </label>
+          <label class="radio-card" data-val="little">
+            <input type="radio" name="helped" value="little" />
+            <span class="radio-dot"></span>
+            <span class="radio-label">ساعدني شوي بس</span>
+          </label>
+          <label class="radio-card" data-val="no">
+            <input type="radio" name="helped" value="no" />
+            <span class="radio-dot"></span>
+            <span class="radio-label">صراحة ما ساعدني 😅</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="q-label">
+          <span class="q-num">5</span>
+          <span>أي مزايا أعجبتك أكثر؟</span>
+        </div>
+        <div class="q-hint">اختر الكل اللي تنطبق</div>
+        <div class="chips" id="featuresChips">
+          <div class="chip" data-val="notes">الملخصات والشرح</div>
+          <div class="chip" data-val="questions">بنك الأسئلة</div>
+          <div class="chip" data-val="past">التجميعات السابقة</div>
+          <div class="chip" data-val="flashcards">البطاقات التعليمية</div>
+          <div class="chip" data-val="quizzes">الكويزات</div>
+          <div class="chip" data-val="design">التصميم والألوان</div>
+          <div class="chip" data-val="arabic">الشرح بالعربي</div>
+          <div class="chip" data-val="dark">الوضع الليلي</div>
+          <div class="chip" data-val="pdf">تصدير PDF</div>
+          <div class="chip" data-val="gamif">التحفيز (XP، شارات)</div>
+          <div class="chip" data-val="speed">السرعة والأداء</div>
+          <div class="chip" data-val="mobile">شغّال على الجوال</div>
+          <div class="chip" data-val="other">آخر...</div>
+        </div>
+        <input type="text" class="other-input" id="otherFeature" placeholder="اكتب الميزة..." style="display:none;" />
+      </div>
+
+      <div class="card">
+        <div class="q-label">
+          <span class="q-num">6</span>
+          <span>كم مرة استخدمت الموقع قبل الاختبار؟</span>
+        </div>
+        <div class="radios" id="usageRadios">
+          <label class="radio-card" data-val="daily">
+            <input type="radio" name="usage" value="daily" />
+            <span class="radio-dot"></span>
+            <span class="radio-label">يومياً · اعتمدت عليه بشكل أساسي</span>
+          </label>
+          <label class="radio-card" data-val="few">
+            <input type="radio" name="usage" value="few" />
+            <span class="radio-dot"></span>
+            <span class="radio-label">عدة مرات في الأسبوع</span>
+          </label>
+          <label class="radio-card" data-val="night">
+            <input type="radio" name="usage" value="night" />
+            <span class="radio-dot"></span>
+            <span class="radio-label">ليلة الاختبار فقط 😅</span>
+          </label>
+          <label class="radio-card" data-val="once">
+            <input type="radio" name="usage" value="once" />
+            <span class="radio-dot"></span>
+            <span class="radio-label">مرة أو مرتين</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="q-label">
+          <span class="q-num">7</span>
+          <span>كيف عرفت عن الموقع؟</span>
+        </div>
+        <div class="radios" id="sourceRadios">
+          <label class="radio-card" data-val="whatsapp">
+            <input type="radio" name="source" value="whatsapp" />
+            <span class="radio-dot"></span>
+            <span class="radio-label">قروب الشعبة 💬</span>
+          </label>
+          <label class="radio-card" data-val="telegram">
+            <input type="radio" name="source" value="telegram" />
+            <span class="radio-dot"></span>
+            <span class="radio-label">قناة التلقرام ✈️</span>
+          </label>
+          <label class="radio-card" data-val="twitter">
+            <input type="radio" name="source" value="twitter" />
+            <span class="radio-dot"></span>
+            <span class="radio-label">القروب العام 📣</span>
+          </label>
+          <label class="radio-card" data-val="friend">
+            <input type="radio" name="source" value="friend" />
+            <span class="radio-dot"></span>
+            <span class="radio-label">صديق نصحني 🙌</span>
+          </label>
+          <label class="radio-card" data-val="other">
+            <input type="radio" name="source" value="other" />
+            <span class="radio-dot"></span>
+            <span class="radio-label">طريقة ثانية...</span>
+          </label>
+        </div>
+        <input type="text" class="other-input" id="otherSource" placeholder="من وين عرفت؟" style="display:none;" />
+      </div>
+
+      <div class="card">
+        <div class="q-label">
+          <span class="q-num">8</span>
+          <span>وش تقترح أطوّره أو أضيفه؟</span>
+        </div>
+        <textarea id="comment" placeholder="أي شي ناقص، أو شي كان يمكن يكون أحسن، أو فكرة تبيني أضيفها..."></textarea>
+      </div>
+
+      <div class="card">
+        <div class="q-label">
+          <span class="q-num">9</span>
+          <span>وش السلبيات أو الأشياء اللي ما عجبتك؟</span>
+        </div>
+        <div class="q-hint">كن صريح معاي — هذا اللي يساعدني أحسّن الموقع فعلياً</div>
+        <textarea id="cons" placeholder="أي شي ضايقك، أو ميزة ناقصة، أو خطأ لقيته، أو تجربة سيئة..."></textarea>
+      </div>
+
+      <div class="card">
+        <div class="q-label">
+          <span class="q-num">10</span>
+          <span>أي كورسات تبي الموقع الجاي يغطيها؟</span>
+        </div>
+        <div class="q-hint">اكتب أسماء الكورسات اللي عندك في الفترة الجاية (ميد 2 / فاينال)</div>
+        <input type="text" class="other-input" id="coursesText" placeholder="مثال: BUS 214 · FIN 200 · MKT 201 ..." style="display:block; margin-top:0;" />
+      </div>
+
+      <div class="card">
+        <div class="q-label">
+          <span class="q-num">11</span>
+          <span>رقم واتسابك للمتابعة</span>
+        </div>
+        <div class="q-hint">عشان أقدر أرد عليك لو فكرتك تستاهل النقاش (ما راح ينشر في أي مكان)</div>
+        <input type="tel" class="other-input" id="whatsapp" placeholder="مثال: 05XXXXXXXX" style="display:block; margin-top:0;" />
+      </div>
+
+      <div class="submit-wrap">
+        <button type="submit" class="submit-btn" id="submitBtn">أرسل التقييم 🚀</button>
+        <div class="submit-hint">ما تحتاج حساب · أقل من دقيقة · إجاباتك تبقى عندي بس</div>
+      </div>
+    </form>
+
+    <section class="thankyou" id="thankyou">
+      <div class="thankyou-emoji">🎉</div>
+      <h2>شكراً من قلبي</h2>
+      <p>تقييمك وصلني. كل فكرة ذكرتها بتساعدني أبني الموقع الجاي أحسن. ربي يوفقك في اختباراتك يا بطل 🌟</p>
+      <p style="margin-top:14px; font-weight:700; color:var(--text);">ولا تنساني من دعوة صادقة 🤲💛</p>
+      <div class="contact-row">
+        <a class="contact-btn" href="https://wa.me/966594555022" target="_blank" rel="noopener">
+          <span>💬</span><span>واتساب</span>
+        </a>
+        <a class="contact-btn" href="https://t.me/p6_op" target="_blank" rel="noopener">
+          <span>✈️</span><span>تلقرام</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="foot">
+      صُنع بحب في قلب جامعة الملك سعود · HOSAM Study Hub
+      <div class="foot-links">
+        <a href="https://mkt201.vercel.app" target="_blank" rel="noopener">MKT 201</a>
+        <span class="foot-sep">·</span>
+        <a href="https://bus-214-study-hub.vercel.app" target="_blank" rel="noopener">BUS 214</a>
+        <span class="foot-sep">·</span>
+        <a href="https://hosamalmotairi.github.io/fin200-notes/fin200_edition.html" target="_blank" rel="noopener">FIN 200</a>
+      </div>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBkIRFpGXQs2dKsBxJCZqHAqnq4mz2MxYw",
+      authDomain: "mkt201-study-hub.firebaseapp.com",
+      projectId: "mkt201-study-hub",
+      storageBucket: "mkt201-study-hub.firebasestorage.app",
+      messagingSenderId: "445861877544",
+      appId: "1:445861877544:web:fc3e1c0bb3d52cb82f4fe4"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const state = { sites:[], nps:null, helped:null, features:[], usage:null, source:null };
+
+    const darkToggle = document.getElementById('darkToggle');
+    if (localStorage.getItem('hosam_dark') === '1') {
+      document.body.classList.add('dark');
+      darkToggle.textContent = '☀️';
+    }
+    darkToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark');
+      const isDark = document.body.classList.contains('dark');
+      darkToggle.textContent = isDark ? '☀️' : '🌙';
+      localStorage.setItem('hosam_dark', isDark ? '1' : '0');
+    });
+
+    document.querySelectorAll('.site-pick').forEach(el => {
+      el.addEventListener('click', e => {
+        e.preventDefault();
+        const site = el.dataset.site;
+        const cb = el.querySelector('input');
+        el.classList.toggle('selected');
+        cb.checked = el.classList.contains('selected');
+        if (el.classList.contains('selected')) {
+          if (!state.sites.includes(site)) state.sites.push(site);
+        } else {
+          state.sites = state.sites.filter(s => s !== site);
+        }
+      });
+    });
+
+    document.querySelectorAll('.nps-btn').forEach(b => {
+      b.addEventListener('click', () => {
+        document.querySelectorAll('.nps-btn').forEach(x => x.classList.remove('selected'));
+        b.classList.add('selected');
+        state.nps = Number(b.dataset.nps);
+      });
+    });
+
+    const otherFeatureInput = document.getElementById('otherFeature');
+    document.querySelectorAll('#featuresChips .chip').forEach(c => {
+      c.addEventListener('click', () => {
+        c.classList.toggle('selected');
+        const v = c.dataset.val;
+        if (c.classList.contains('selected')) {
+          if (!state.features.includes(v)) state.features.push(v);
+        } else {
+          state.features = state.features.filter(x => x !== v);
+        }
+        if (v === 'other') {
+          otherFeatureInput.style.display = c.classList.contains('selected') ? 'block' : 'none';
+          if (!c.classList.contains('selected')) otherFeatureInput.value = '';
+        }
+      });
+    });
+
+    function wireRadios(groupId, stateKey) {
+      const group = document.getElementById(groupId);
+      group.querySelectorAll('.radio-card').forEach(r => {
+        r.addEventListener('click', e => {
+          e.preventDefault();
+          group.querySelectorAll('.radio-card').forEach(x => x.classList.remove('selected'));
+          r.classList.add('selected');
+          state[stateKey] = r.dataset.val;
+          if (groupId === 'sourceRadios') {
+            const otherSourceInput = document.getElementById('otherSource');
+            otherSourceInput.style.display = (r.dataset.val === 'other') ? 'block' : 'none';
+            if (r.dataset.val !== 'other') otherSourceInput.value = '';
+          }
+        });
+      });
+    }
+    wireRadios('helpedRadios', 'helped');
+    wireRadios('usageRadios', 'usage');
+    wireRadios('sourceRadios', 'source');
+
+    const toast = document.getElementById('toast');
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3200);
+    }
+
+    const form = document.getElementById('feedbackForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const thankyou = document.getElementById('thankyou');
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const nameVal = document.getElementById('userName').value.trim();
+      const commentVal = document.getElementById('comment').value.trim();
+      const consVal = document.getElementById('cons').value.trim();
+      const coursesVal = document.getElementById('coursesText').value.trim();
+
+      const whatsappVal = document.getElementById('whatsapp').value.trim();
+      if (!nameVal) { showToast('اكتب اسمك 🙏'); document.getElementById('userName').focus(); return; }
+      if (!state.sites.length) { showToast('اختر موقع واحد على الأقل 🙏'); return; }
+      if (state.nps === null) { showToast('اختر تقييم من 0 إلى 10 🙏'); return; }
+      if (!state.helped) { showToast('قولي صراحة، الموقع ساعدك في الاختبار؟ 🙏'); return; }
+      if (!state.features.length) { showToast('اختر ميزة واحدة على الأقل أعجبتك 🙏'); return; }
+      if (!state.usage) { showToast('اختر كم مرة استخدمت الموقع 🙏'); return; }
+      if (!state.source) { showToast('اختر من وين عرفت عن الموقع 🙏'); return; }
+      if (!commentVal) { showToast('اكتب اقتراحك — حتى لو سطر واحد 🙏'); document.getElementById('comment').focus(); return; }
+      if (!consVal) { showToast('اكتب أي سلبية أو ملاحظة — صراحتك تساعدني 🙏'); document.getElementById('cons').focus(); return; }
+      if (!coursesVal) { showToast('اكتب كورسات الفترة الجاية 🙏'); document.getElementById('coursesText').focus(); return; }
+      if (!whatsappVal) { showToast('اكتب رقم واتسابك 🙏'); document.getElementById('whatsapp').focus(); return; }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = '⏳ جاري الإرسال...';
+
+      const payload = {
+        sites: state.sites,
+        nps: state.nps,
+        helped: state.helped,
+        features: state.features,
+        otherFeature: otherFeatureInput.value.trim(),
+        usage: state.usage,
+        source: state.source,
+        otherSource: document.getElementById('otherSource').value.trim(),
+        comment: document.getElementById('comment').value.trim(),
+        cons: document.getElementById('cons').value.trim(),
+        coursesText: document.getElementById('coursesText').value.trim(),
+        whatsapp: document.getElementById('whatsapp').value.trim(),
+        name: document.getElementById('userName').value.trim(),
+        userAgent: navigator.userAgent,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      try {
+        await db.collection('hosam_feedback').add(payload);
+        form.style.display = 'none';
+        thankyou.classList.add('show');
+        window.scrollTo({ top:0, behavior:'smooth' });
+      } catch (err) {
+        console.error(err);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'أرسل التقييم 🚀';
+        showToast('حصل خطأ. جرب مرة ثانية 🙏');
+      }
+    });
+  </script>
+</body>
+</html>
